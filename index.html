@@ -79,17 +79,16 @@
       font-size: 0.32em;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      opacity: 0;
-      transform: translateY(6px);
     }
+    .jp { opacity: 0; transform: translateY(6px); }
     @media (hover: hover) {
-      .mark:hover .jp { opacity: 0; transform: translateY(-6px); }
-      .mark:hover .name { opacity: 1; transform: translateY(0); }
+      .mark:hover .name { opacity: 0; transform: translateY(-6px); }
+      .mark:hover .jp { opacity: 1; transform: translateY(0); }
     }
-    .mark:focus-visible .jp,
-    .mark.is-open .jp { opacity: 0; transform: translateY(-6px); }
     .mark:focus-visible .name,
-    .mark.is-open .name { opacity: 1; transform: translateY(0); }
+    .mark.is-open .name { opacity: 0; transform: translateY(-6px); }
+    .mark:focus-visible .jp,
+    .mark.is-open .jp { opacity: 1; transform: translateY(0); }
 
     .links {
       position: fixed;
@@ -129,7 +128,7 @@
   </style>
 </head>
 <body>
-  <h1><button class="mark" type="button" aria-describedby="name"><span class="jp" lang="ja">生き甲斐</span><span class="name" id="name">Mic Fox</span></button></h1>
+  <h1><button class="mark" type="button" aria-describedby="jp"><span class="name">Mic Fox</span><span class="jp" id="jp" lang="ja">生き甲斐</span></button></h1>
 
   <nav class="links" aria-label="Social">
     <a href="https://www.linkedin.com/in/micfox/" target="_blank" rel="noopener">LinkedIn</a>
@@ -137,9 +136,10 @@
   </nav>
 
   <script>
-    // Touch screens have no hover, so a tap toggles the name instead.
+    // Touch screens have no hover, so a tap toggles 生き甲斐 instead.
     const mark = document.querySelector('.mark');
     mark.addEventListener('click', (e) => {
+      if (matchMedia('(hover: hover)').matches) return;
       e.stopPropagation();
       mark.classList.toggle('is-open');
     });
