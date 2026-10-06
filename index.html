@@ -7,7 +7,7 @@
   <meta name="description" content="Mic Fox">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300&family=Inter:wght@400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #0e0c0b;
@@ -16,6 +16,13 @@
       --glow-b: rgba(120, 72, 160, 0.12);
       --sans: "Inter", system-ui, -apple-system, sans-serif;
       --ease: cubic-bezier(0.22, 1.4, 0.36, 1);
+      --love: #d67840;
+      --good: #7a4fb0;
+      --needs: #2f8f8a;
+      --paid: #c0487a;
+      --surface: #171413;
+      --line: rgba(242, 235, 227, 0.1);
+      --muted: rgba(242, 235, 227, 0.62);
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; }
@@ -64,7 +71,7 @@
       font: inherit;
       font-size: clamp(3rem, 14vw, 9rem);
       letter-spacing: 0.04em;
-      cursor: default;
+      cursor: pointer;
       -webkit-tap-highlight-color: transparent;
       outline: none;
     }
@@ -85,10 +92,9 @@
       .mark:hover .name { opacity: 0; transform: translateY(-6px); }
       .mark:hover .jp { opacity: 1; transform: translateY(0); }
     }
-    .mark:focus-visible .name,
-    .mark.is-open .name { opacity: 0; transform: translateY(-6px); }
-    .mark:focus-visible .jp,
-    .mark.is-open .jp { opacity: 1; transform: translateY(0); }
+    .mark:focus-visible .name { opacity: 0; transform: translateY(-6px); }
+    .mark:focus-visible .jp { opacity: 1; transform: translateY(0); }
+    .mark:active { transform: scale(0.98); }
 
     .links {
       position: fixed;
@@ -119,31 +125,296 @@
     .links a:focus-visible { opacity: 1; outline: 1px solid rgba(242, 235, 227, 0.4); outline-offset: 2px; }
     .links a:active { opacity: 1; transform: translateY(0) scale(0.97); }
 
+    /* ---------- Ikigai lightbox ---------- */
+    .ikigai {
+      margin: auto;
+      width: min(1040px, calc(100% - 32px));
+      max-height: calc(100dvh - 32px);
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background:
+        radial-gradient(70% 60% at 20% 10%, rgba(214, 120, 64, 0.08), transparent 70%),
+        radial-gradient(60% 50% at 90% 90%, rgba(122, 79, 176, 0.1), transparent 70%),
+        var(--surface);
+      color: var(--ink);
+      box-shadow:
+        0 1px 0 rgba(242, 235, 227, 0.06) inset,
+        0 2px 6px rgba(10, 4, 2, 0.3),
+        0 24px 60px -12px rgba(30, 10, 4, 0.55),
+        0 60px 140px -30px rgba(80, 40, 120, 0.35);
+      overflow: auto;
+      overscroll-behavior: contain;
+      opacity: 0;
+      transform: translateY(16px) scale(0.97);
+      transition: opacity 0.35s ease, transform 0.6s var(--ease);
+    }
+    .ikigai.is-visible { opacity: 1; transform: none; }
+    .ikigai::backdrop {
+      background: rgba(8, 6, 5, 0.72);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+    .ikigai.is-visible::backdrop { opacity: 1; }
+
+    .ikigai__inner {
+      display: grid;
+      gap: 2rem;
+      padding: 3.5rem 1.5rem 2rem;
+    }
+    @media (min-width: 900px) {
+      .ikigai__inner {
+        grid-template-columns: 1.05fr 1fr;
+        align-items: center;
+        gap: 3rem;
+        padding: 3rem 3.5rem 2.5rem;
+      }
+    }
+
+    .ikigai__close {
+      position: sticky;
+      top: 0.75rem;
+      margin: 0.75rem 0.75rem -3.25rem auto;
+      z-index: 2;
+      width: 2.5rem;
+      height: 2.5rem;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(23, 20, 19, 0.8);
+      color: var(--ink);
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.25s ease, transform 0.4s var(--ease);
+      outline: none;
+    }
+    .ikigai__close:hover { opacity: 1; transform: rotate(90deg); }
+    .ikigai__close:focus-visible { opacity: 1; outline: 1px solid rgba(242, 235, 227, 0.5); outline-offset: 2px; }
+    .ikigai__close:active { transform: rotate(90deg) scale(0.92); }
+
+    .ikigai__eyebrow {
+      font-family: var(--sans);
+      font-size: 0.7rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .ikigai__title {
+      margin-top: 0.75rem;
+      font-weight: 300;
+      font-size: clamp(2.5rem, 7vw, 3.75rem);
+      line-height: 1.05;
+      letter-spacing: 0.02em;
+    }
+    .ikigai__title small {
+      display: block;
+      margin-top: 0.5rem;
+      font-size: 0.42em;
+      letter-spacing: -0.01em;
+      font-style: italic;
+      color: var(--muted);
+    }
+    .ikigai__lede {
+      margin-top: 1.25rem;
+      font-family: var(--sans);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--muted);
+      max-width: 34rem;
+    }
+    .ikigai__lede b { color: var(--ink); font-weight: 600; }
+
+    .ikigai__h {
+      margin-top: 2rem;
+      font-family: var(--sans);
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+    }
+    .misses {
+      list-style: none;
+      margin-top: 1rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    .misses li {
+      padding: 1rem;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(242, 235, 227, 0.025);
+      font-family: var(--sans);
+      font-size: 0.8rem;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+    .misses strong { display: block; color: var(--ink); font-weight: 600; margin-bottom: 0.25rem; }
+    .dots { display: flex; gap: 4px; margin-bottom: 0.6rem; }
+    .dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+    .dots i.off { background: transparent; box-shadow: inset 0 0 0 1px var(--c); opacity: 0.7; }
+
+    .ikigai__note {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--line);
+      font-family: var(--sans);
+      font-size: 0.8rem;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    /* diagram */
+    .venn { width: 100%; max-width: 520px; margin: 0 auto; display: block; overflow: visible; }
+    .venn .c {
+      mix-blend-mode: screen;
+      fill-opacity: 0.5;
+      stroke: rgba(242, 235, 227, 0.35);
+      stroke-width: 1;
+      transform-box: fill-box;
+      transform-origin: center;
+      opacity: 0;
+      transform: scale(0.85);
+      transition: opacity 0.7s ease, transform 0.9s var(--ease), fill-opacity 0.3s ease;
+    }
+    .ikigai.is-visible .venn .c { opacity: 1; transform: none; }
+    .ikigai.is-visible .venn .c:nth-of-type(2) { transition-delay: 0.08s; }
+    .ikigai.is-visible .venn .c:nth-of-type(3) { transition-delay: 0.16s; }
+    .ikigai.is-visible .venn .c:nth-of-type(4) { transition-delay: 0.24s; }
+    .venn .c:hover { fill-opacity: 0.72; }
+    .venn text {
+      fill: var(--ink);
+      font-family: var(--sans);
+      text-anchor: middle;
+      pointer-events: none;
+    }
+    .venn .t-sm { font-size: 13px; opacity: 0.8; }
+    .venn .t-lg { font-size: 15px; font-weight: 600; letter-spacing: 0.12em; }
+    .venn .t-ov { font-size: 11px; font-weight: 600; letter-spacing: 0.18em; opacity: 0.9; }
+    .venn .core { fill: var(--surface); stroke: rgba(242, 235, 227, 0.7); stroke-width: 1; }
+    .venn .t-jp { font-family: "Noto Serif JP", serif; font-size: 17px; }
+    .venn .t-core { font-size: 9px; letter-spacing: 0.2em; opacity: 0.75; }
+    .venn .halo { fill: url(#halo); opacity: 0; transition: opacity 1.2s ease 0.4s; }
+    .ikigai.is-visible .venn .halo { opacity: 1; }
+
+    @media (max-width: 520px) {
+      .misses { grid-template-columns: 1fr; }
+      .ikigai__inner { padding-left: 1rem; padding-right: 1rem; }
+      .venn .t-sm { font-size: 19px; }
+      .venn .t-lg { font-size: 22px; letter-spacing: 0.06em; }
+      .venn .t-ov { font-size: 15px; letter-spacing: 0.08em; }
+      .venn .t-jp { font-size: 21px; }
+      .venn .t-core { font-size: 11px; }
+    }
+
     @keyframes rise { to { opacity: 1; transform: translateY(0); } }
     @keyframes fade { to { opacity: 1; } }
     @media (prefers-reduced-motion: reduce) {
       h1, .links { animation: none; opacity: 1; transform: none; }
-      .mark > span, .links a { transition: none; }
+      .mark > span, .links a, .ikigai, .ikigai::backdrop, .venn .c, .venn .halo { transition: none; }
     }
   </style>
 </head>
 <body>
-  <h1><button class="mark" type="button" aria-describedby="jp"><span class="name">Mic Fox</span><span class="jp" id="jp" lang="ja">生き甲斐</span></button></h1>
+  <h1><button class="mark" type="button" aria-haspopup="dialog" aria-controls="ikigai" aria-describedby="jp"><span class="name">Mic Fox</span><span class="jp" id="jp" lang="ja">生き甲斐</span></button></h1>
 
   <nav class="links" aria-label="Social">
     <a href="https://www.linkedin.com/in/micfox/" target="_blank" rel="noopener">LinkedIn</a>
     <a href="https://www.instagram.com/micfox.co/" target="_blank" rel="noopener">Instagram</a>
   </nav>
 
+  <dialog class="ikigai" id="ikigai" aria-labelledby="ikigai-title">
+    <button class="ikigai__close" type="button" aria-label="Close">
+      <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    </button>
+    <div class="ikigai__inner">
+      <svg class="venn" viewBox="0 0 600 600" role="img" aria-label="Four overlapping circles: what you love, what you are good at, what the world needs, and what you can be paid for. Ikigai sits where all four meet.">
+        <defs>
+          <radialGradient id="halo">
+            <stop offset="0" stop-color="#f2ebe3" stop-opacity="0.35"/>
+            <stop offset="1" stop-color="#f2ebe3" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <circle class="c" cx="300" cy="190" r="150" fill="var(--love)"/>
+        <circle class="c" cx="190" cy="300" r="150" fill="var(--good)"/>
+        <circle class="c" cx="410" cy="300" r="150" fill="var(--needs)"/>
+        <circle class="c" cx="300" cy="410" r="150" fill="var(--paid)"/>
+
+        <text class="t-sm" x="300" y="92">What you</text>
+        <text class="t-lg" x="300" y="113">LOVE</text>
+        <text class="t-sm" x="110" y="292">What you're</text>
+        <text class="t-lg" x="110" y="313">GOOD AT</text>
+        <text class="t-sm" x="490" y="292">What the world</text>
+        <text class="t-lg" x="490" y="313">NEEDS</text>
+        <text class="t-sm" x="300" y="497">What you can be</text>
+        <text class="t-lg" x="300" y="518">PAID FOR</text>
+
+        <text class="t-ov" x="222" y="222">PASSION</text>
+        <text class="t-ov" x="378" y="222">MISSION</text>
+        <text class="t-ov" x="222" y="386">PROFESSION</text>
+        <text class="t-ov" x="378" y="386">VOCATION</text>
+
+        <circle class="halo" cx="300" cy="300" r="90"/>
+        <circle class="core" cx="300" cy="300" r="48"/>
+        <text class="t-jp" x="300" y="302" lang="ja">生き甲斐</text>
+        <text class="t-core" x="300" y="320">IKIGAI</text>
+      </svg>
+
+      <div>
+        <p class="ikigai__eyebrow">A Japanese concept</p>
+        <h2 class="ikigai__title" id="ikigai-title"><span lang="ja">生き甲斐</span><small>A reason for being</small></h2>
+        <p class="ikigai__lede"><b lang="ja">生き</b> <i>iki</i> means to live; <b lang="ja">甲斐</b> <i>kai</i> means worth, or the result of effort. Together: the thing that makes life worth living, and what gets you up in the morning.</p>
+
+        <h3 class="ikigai__h">Three out of four</h3>
+        <ul class="misses">
+          <li>
+            <span class="dots"><i style="--c:var(--love)"></i><i style="--c:var(--good)"></i><i style="--c:var(--needs)"></i><i class="off" style="--c:var(--paid)"></i></span>
+            <strong>No pay</strong>Delight and fullness, but no wealth.
+          </li>
+          <li>
+            <span class="dots"><i style="--c:var(--love)"></i><i style="--c:var(--good)"></i><i class="off" style="--c:var(--needs)"></i><i style="--c:var(--paid)"></i></span>
+            <strong>Not needed</strong>Satisfaction, with a sense of uselessness.
+          </li>
+          <li>
+            <span class="dots"><i class="off" style="--c:var(--love)"></i><i style="--c:var(--good)"></i><i style="--c:var(--needs)"></i><i style="--c:var(--paid)"></i></span>
+            <strong>No love</strong>Comfortable, but empty.
+          </li>
+          <li>
+            <span class="dots"><i style="--c:var(--love)"></i><i class="off" style="--c:var(--good)"></i><i style="--c:var(--needs)"></i><i style="--c:var(--paid)"></i></span>
+            <strong>Not your strength</strong>Excitement, with a sense of uncertainty.
+          </li>
+        </ul>
+
+        <p class="ikigai__note">In Japan, ikigai is often quieter than a life mission: a morning routine, a craft practiced for decades, the people you cook for. It's closely tied to Okinawa, home to some of the longest-lived people on earth. The four-circle chart is a Western addition, popularized around 2014, but it's a useful map for finding where your own circles meet.</p>
+      </div>
+    </div>
+  </dialog>
+
   <script>
-    // Touch screens have no hover, so a tap toggles 生き甲斐 instead.
     const mark = document.querySelector('.mark');
-    mark.addEventListener('click', (e) => {
-      if (matchMedia('(hover: hover)').matches) return;
-      e.stopPropagation();
-      mark.classList.toggle('is-open');
-    });
-    document.addEventListener('click', () => mark.classList.remove('is-open'));
+    const box = document.getElementById('ikigai');
+
+    function openBox() {
+      box.showModal();
+      requestAnimationFrame(() => requestAnimationFrame(() => box.classList.add('is-visible')));
+    }
+    function closeBox() {
+      if (!box.open || !box.classList.contains('is-visible')) return;
+      box.classList.remove('is-visible');
+      const done = () => box.close();
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return done();
+      box.addEventListener('transitionend', done, { once: true });
+      setTimeout(() => box.open && done(), 500);
+    }
+
+    mark.addEventListener('click', openBox);
+    box.querySelector('.ikigai__close').addEventListener('click', closeBox);
+    // Click on the backdrop (the dialog element itself, outside its content) closes it.
+    box.addEventListener('click', (e) => { if (e.target === box) closeBox(); });
+    box.addEventListener('cancel', (e) => { e.preventDefault(); closeBox(); });
   </script>
 </body>
 </html>
